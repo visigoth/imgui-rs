@@ -29,7 +29,8 @@ fn main() -> io::Result<()> {
     build
         .define("CIMGUI_NO_EXPORT", None)
         .define("IMGUI_DISABLE_WIN32_FUNCTIONS", None)
-        .define("IMGUI_DISABLE_OSX_FUNCTIONS", None);
+        .define("IMGUI_DISABLE_OSX_FUNCTIONS", None)
+        .define("IMGUI_DISABLE_OBSOLETE_FUNCTIONS", "1");
 
     build.flag_if_supported("-Wno-return-type-c-linkage");
     for path in &CPP_FILES {
