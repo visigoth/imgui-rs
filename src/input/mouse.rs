@@ -50,6 +50,8 @@ pub enum MouseCursor {
     ResizeNWSE = sys::ImGuiMouseCursor_ResizeNWSE,
     /// Not used automatically, use for e.g. hyperlinks
     Hand = sys::ImGuiMouseCursor_Hand,
+    // Not used automatically
+    NotAllowed = sys::ImGuiMouseCursor_NotAllowed,
 }
 
 impl MouseCursor {
@@ -63,6 +65,7 @@ impl MouseCursor {
         MouseCursor::ResizeNESW,
         MouseCursor::ResizeNWSE,
         MouseCursor::Hand,
+        MouseCursor::NotAllowed,
     ];
     /// Total count of `MouseCursor` variants
     pub const COUNT: usize = sys::ImGuiMouseCursor_COUNT as usize;

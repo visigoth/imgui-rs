@@ -5,6 +5,7 @@
 #![allow(non_snake_case)]
 #![allow(clippy::all)]
 
+pub type __darwin_size_t = ::std::os::raw::c_ulong;
 #[repr(C)]
 #[derive(Debug, Default, Copy, Clone, PartialEq)]
 pub struct ImVec2_Simple {
@@ -151,6 +152,7 @@ pub type ImGuiCond = ::std::os::raw::c_int;
 pub type ImGuiDataType = ::std::os::raw::c_int;
 pub type ImGuiDir = ::std::os::raw::c_int;
 pub type ImGuiKey = ::std::os::raw::c_int;
+pub type ImGuiMouseButton = ::std::os::raw::c_int;
 pub type ImGuiMouseCursor = ::std::os::raw::c_int;
 pub type ImGuiStyleVar = ::std::os::raw::c_int;
 pub type ImDrawCornerFlags = ::std::os::raw::c_int;
@@ -1260,6 +1262,8 @@ pub const ImGuiTreeNodeFlags_OpenOnArrow: ImGuiTreeNodeFlags_ = 128;
 pub const ImGuiTreeNodeFlags_Leaf: ImGuiTreeNodeFlags_ = 256;
 pub const ImGuiTreeNodeFlags_Bullet: ImGuiTreeNodeFlags_ = 512;
 pub const ImGuiTreeNodeFlags_FramePadding: ImGuiTreeNodeFlags_ = 1024;
+pub const ImGuiTreeNodeFlags_SpanAvailWidth: ImGuiTreeNodeFlags_ = 2048;
+pub const ImGuiTreeNodeFlags_SpanFullWidth: ImGuiTreeNodeFlags_ = 4096;
 pub const ImGuiTreeNodeFlags_NavLeftJumpsBackHere: ImGuiTreeNodeFlags_ = 8192;
 pub const ImGuiTreeNodeFlags_CollapsingHeader: ImGuiTreeNodeFlags_ = 26;
 pub type ImGuiTreeNodeFlags_ = u32;
@@ -1268,6 +1272,7 @@ pub const ImGuiSelectableFlags_DontClosePopups: ImGuiSelectableFlags_ = 1;
 pub const ImGuiSelectableFlags_SpanAllColumns: ImGuiSelectableFlags_ = 2;
 pub const ImGuiSelectableFlags_AllowDoubleClick: ImGuiSelectableFlags_ = 4;
 pub const ImGuiSelectableFlags_Disabled: ImGuiSelectableFlags_ = 8;
+pub const ImGuiSelectableFlags_AllowItemOverlap: ImGuiSelectableFlags_ = 16;
 pub type ImGuiSelectableFlags_ = u32;
 pub const ImGuiComboFlags_None: ImGuiComboFlags_ = 0;
 pub const ImGuiComboFlags_PopupAlignLeft: ImGuiComboFlags_ = 1;
@@ -1386,12 +1391,11 @@ pub const ImGuiNavInput_FocusNext: ImGuiNavInput_ = 13;
 pub const ImGuiNavInput_TweakSlow: ImGuiNavInput_ = 14;
 pub const ImGuiNavInput_TweakFast: ImGuiNavInput_ = 15;
 pub const ImGuiNavInput_KeyMenu_: ImGuiNavInput_ = 16;
-pub const ImGuiNavInput_KeyTab_: ImGuiNavInput_ = 17;
-pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 18;
-pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 19;
-pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 20;
-pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 21;
-pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 22;
+pub const ImGuiNavInput_KeyLeft_: ImGuiNavInput_ = 17;
+pub const ImGuiNavInput_KeyRight_: ImGuiNavInput_ = 18;
+pub const ImGuiNavInput_KeyUp_: ImGuiNavInput_ = 19;
+pub const ImGuiNavInput_KeyDown_: ImGuiNavInput_ = 20;
+pub const ImGuiNavInput_COUNT: ImGuiNavInput_ = 21;
 pub const ImGuiNavInput_InternalStart_: ImGuiNavInput_ = 16;
 pub type ImGuiNavInput_ = u32;
 pub const ImGuiConfigFlags_None: ImGuiConfigFlags_ = 0;
@@ -1514,6 +1518,11 @@ pub const ImGuiColorEditFlags__DataTypeMask: ImGuiColorEditFlags_ = 25165824;
 pub const ImGuiColorEditFlags__PickerMask: ImGuiColorEditFlags_ = 100663296;
 pub const ImGuiColorEditFlags__InputMask: ImGuiColorEditFlags_ = 402653184;
 pub type ImGuiColorEditFlags_ = u32;
+pub const ImGuiMouseButton_Left: ImGuiMouseButton_ = 0;
+pub const ImGuiMouseButton_Right: ImGuiMouseButton_ = 1;
+pub const ImGuiMouseButton_Middle: ImGuiMouseButton_ = 2;
+pub const ImGuiMouseButton_COUNT: ImGuiMouseButton_ = 5;
+pub type ImGuiMouseButton_ = u32;
 pub const ImGuiMouseCursor_None: ImGuiMouseCursor_ = -1;
 pub const ImGuiMouseCursor_Arrow: ImGuiMouseCursor_ = 0;
 pub const ImGuiMouseCursor_TextInput: ImGuiMouseCursor_ = 1;
@@ -1523,7 +1532,8 @@ pub const ImGuiMouseCursor_ResizeEW: ImGuiMouseCursor_ = 4;
 pub const ImGuiMouseCursor_ResizeNESW: ImGuiMouseCursor_ = 5;
 pub const ImGuiMouseCursor_ResizeNWSE: ImGuiMouseCursor_ = 6;
 pub const ImGuiMouseCursor_Hand: ImGuiMouseCursor_ = 7;
-pub const ImGuiMouseCursor_COUNT: ImGuiMouseCursor_ = 8;
+pub const ImGuiMouseCursor_NotAllowed: ImGuiMouseCursor_ = 8;
+pub const ImGuiMouseCursor_COUNT: ImGuiMouseCursor_ = 9;
 pub type ImGuiMouseCursor_ = i32;
 pub const ImGuiCond_Always: ImGuiCond_ = 1;
 pub const ImGuiCond_Once: ImGuiCond_ = 2;
@@ -1973,6 +1983,7 @@ pub struct ImGuiIO {
     pub ConfigInputTextCursorBlink: bool,
     pub ConfigWindowsResizeFromEdges: bool,
     pub ConfigWindowsMoveFromTitleBarOnly: bool,
+    pub ConfigWindowsMemoryCompactTimer: f32,
     pub BackendPlatformName: *const ::std::os::raw::c_char,
     pub BackendRendererName: *const ::std::os::raw::c_char,
     pub BackendPlatformUserData: *mut ::std::os::raw::c_void,
@@ -2004,7 +2015,7 @@ pub struct ImGuiIO {
     pub KeyAlt: bool,
     pub KeySuper: bool,
     pub KeysDown: [bool; 512usize],
-    pub NavInputs: [f32; 22usize],
+    pub NavInputs: [f32; 21usize],
     pub WantCaptureMouse: bool,
     pub WantCaptureKeyboard: bool,
     pub WantTextInput: bool,
@@ -2033,15 +2044,15 @@ pub struct ImGuiIO {
     pub MouseDragMaxDistanceSqr: [f32; 5usize],
     pub KeysDownDuration: [f32; 512usize],
     pub KeysDownDurationPrev: [f32; 512usize],
-    pub NavInputsDownDuration: [f32; 22usize],
-    pub NavInputsDownDurationPrev: [f32; 22usize],
+    pub NavInputsDownDuration: [f32; 21usize],
+    pub NavInputsDownDurationPrev: [f32; 21usize],
     pub InputQueueCharacters: ImVector_ImWchar,
 }
 #[test]
 fn bindgen_test_layout_ImGuiIO() {
     assert_eq!(
         ::std::mem::size_of::<ImGuiIO>(),
-        5464usize,
+        5456usize,
         concat!("Size of: ", stringify!(ImGuiIO))
     );
     assert_eq!(
@@ -2297,8 +2308,20 @@ fn bindgen_test_layout_ImGuiIO() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendPlatformName as *const _ as usize },
+        unsafe {
+            &(*(::std::ptr::null::<ImGuiIO>())).ConfigWindowsMemoryCompactTimer as *const _ as usize
+        },
         200usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImGuiIO),
+            "::",
+            stringify!(ConfigWindowsMemoryCompactTimer)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendPlatformName as *const _ as usize },
+        208usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2308,7 +2331,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendRendererName as *const _ as usize },
-        208usize,
+        216usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2318,7 +2341,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendPlatformUserData as *const _ as usize },
-        216usize,
+        224usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2328,7 +2351,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendRendererUserData as *const _ as usize },
-        224usize,
+        232usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2338,7 +2361,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).BackendLanguageUserData as *const _ as usize },
-        232usize,
+        240usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2348,7 +2371,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).GetClipboardTextFn as *const _ as usize },
-        240usize,
+        248usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2358,7 +2381,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).SetClipboardTextFn as *const _ as usize },
-        248usize,
+        256usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2368,7 +2391,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ClipboardUserData as *const _ as usize },
-        256usize,
+        264usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2378,7 +2401,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ImeSetInputScreenPosFn as *const _ as usize },
-        264usize,
+        272usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2388,7 +2411,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).ImeWindowHandle as *const _ as usize },
-        272usize,
+        280usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2398,7 +2421,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).RenderDrawListsFnUnused as *const _ as usize },
-        280usize,
+        288usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2408,7 +2431,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePos as *const _ as usize },
-        288usize,
+        296usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2418,7 +2441,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDown as *const _ as usize },
-        296usize,
+        304usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2428,7 +2451,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseWheel as *const _ as usize },
-        304usize,
+        312usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2438,7 +2461,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseWheelH as *const _ as usize },
-        308usize,
+        316usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2448,7 +2471,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyCtrl as *const _ as usize },
-        312usize,
+        320usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2458,7 +2481,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyShift as *const _ as usize },
-        313usize,
+        321usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2468,7 +2491,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeyAlt as *const _ as usize },
-        314usize,
+        322usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2478,7 +2501,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeySuper as *const _ as usize },
-        315usize,
+        323usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2488,7 +2511,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).KeysDown as *const _ as usize },
-        316usize,
+        324usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2498,7 +2521,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavInputs as *const _ as usize },
-        828usize,
+        836usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2508,7 +2531,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureMouse as *const _ as usize },
-        916usize,
+        920usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2518,7 +2541,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantCaptureKeyboard as *const _ as usize },
-        917usize,
+        921usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2528,7 +2551,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantTextInput as *const _ as usize },
-        918usize,
+        922usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2538,7 +2561,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSetMousePos as *const _ as usize },
-        919usize,
+        923usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2548,7 +2571,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).WantSaveIniSettings as *const _ as usize },
-        920usize,
+        924usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2558,7 +2581,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavActive as *const _ as usize },
-        921usize,
+        925usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2568,7 +2591,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).NavVisible as *const _ as usize },
-        922usize,
+        926usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2578,7 +2601,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).Framerate as *const _ as usize },
-        924usize,
+        928usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2588,7 +2611,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderVertices as *const _ as usize },
-        928usize,
+        932usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2598,7 +2621,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderIndices as *const _ as usize },
-        932usize,
+        936usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2608,7 +2631,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsRenderWindows as *const _ as usize },
-        936usize,
+        940usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2618,7 +2641,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveWindows as *const _ as usize },
-        940usize,
+        944usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2630,7 +2653,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).MetricsActiveAllocations as *const _ as usize
         },
-        944usize,
+        948usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2640,7 +2663,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseDelta as *const _ as usize },
-        948usize,
+        952usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2650,7 +2673,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MousePosPrev as *const _ as usize },
-        956usize,
+        960usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2660,7 +2683,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).MouseClickedPos as *const _ as usize },
-        964usize,
+        968usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2802,7 +2825,7 @@ fn bindgen_test_layout_ImGuiIO() {
         unsafe {
             &(*(::std::ptr::null::<ImGuiIO>())).NavInputsDownDurationPrev as *const _ as usize
         },
-        5360usize,
+        5356usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2812,7 +2835,7 @@ fn bindgen_test_layout_ImGuiIO() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImGuiIO>())).InputQueueCharacters as *const _ as usize },
-        5448usize,
+        5440usize,
         concat!(
             "Offset of field: ",
             stringify!(ImGuiIO),
@@ -2828,7 +2851,7 @@ impl Default for ImGuiIO {
 }
 impl ::std::fmt::Debug for ImGuiIO {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! ( f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, ImeSetInputScreenPosFn: {:?}, ImeWindowHandle: {:?}, RenderDrawListsFnUnused: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [{}], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [{}], KeysDownDurationPrev: [{}], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . ImeSetInputScreenPosFn , self . ImeWindowHandle , self . RenderDrawListsFnUnused , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . KeysDown . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . KeysDownDuration . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . KeysDownDurationPrev . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . InputQueueCharacters )
+        write ! ( f , "ImGuiIO {{ ConfigFlags: {:?}, BackendFlags: {:?}, DisplaySize: {:?}, DeltaTime: {:?}, IniSavingRate: {:?}, IniFilename: {:?}, LogFilename: {:?}, MouseDoubleClickTime: {:?}, MouseDoubleClickMaxDist: {:?}, MouseDragThreshold: {:?}, KeyMap: {:?}, KeyRepeatDelay: {:?}, KeyRepeatRate: {:?}, UserData: {:?}, Fonts: {:?}, FontGlobalScale: {:?}, FontAllowUserScaling: {:?}, FontDefault: {:?}, DisplayFramebufferScale: {:?}, MouseDrawCursor: {:?}, ConfigMacOSXBehaviors: {:?}, ConfigInputTextCursorBlink: {:?}, ConfigWindowsResizeFromEdges: {:?}, ConfigWindowsMoveFromTitleBarOnly: {:?}, ConfigWindowsMemoryCompactTimer: {:?}, BackendPlatformName: {:?}, BackendRendererName: {:?}, BackendPlatformUserData: {:?}, BackendRendererUserData: {:?}, BackendLanguageUserData: {:?}, GetClipboardTextFn: {:?}, SetClipboardTextFn: {:?}, ClipboardUserData: {:?}, ImeSetInputScreenPosFn: {:?}, ImeWindowHandle: {:?}, RenderDrawListsFnUnused: {:?}, MousePos: {:?}, MouseDown: {:?}, MouseWheel: {:?}, MouseWheelH: {:?}, KeyCtrl: {:?}, KeyShift: {:?}, KeyAlt: {:?}, KeySuper: {:?}, KeysDown: [{}], NavInputs: {:?}, WantCaptureMouse: {:?}, WantCaptureKeyboard: {:?}, WantTextInput: {:?}, WantSetMousePos: {:?}, WantSaveIniSettings: {:?}, NavActive: {:?}, NavVisible: {:?}, Framerate: {:?}, MetricsRenderVertices: {:?}, MetricsRenderIndices: {:?}, MetricsRenderWindows: {:?}, MetricsActiveWindows: {:?}, MetricsActiveAllocations: {:?}, MouseDelta: {:?}, MousePosPrev: {:?}, MouseClickedPos: {:?}, MouseClickedTime: {:?}, MouseClicked: {:?}, MouseDoubleClicked: {:?}, MouseReleased: {:?}, MouseDownOwned: {:?}, MouseDownWasDoubleClick: {:?}, MouseDownDuration: {:?}, MouseDownDurationPrev: {:?}, MouseDragMaxDistanceAbs: {:?}, MouseDragMaxDistanceSqr: {:?}, KeysDownDuration: [{}], KeysDownDurationPrev: [{}], NavInputsDownDuration: {:?}, NavInputsDownDurationPrev: {:?}, InputQueueCharacters: {:?} }}" , self . ConfigFlags , self . BackendFlags , self . DisplaySize , self . DeltaTime , self . IniSavingRate , self . IniFilename , self . LogFilename , self . MouseDoubleClickTime , self . MouseDoubleClickMaxDist , self . MouseDragThreshold , self . KeyMap , self . KeyRepeatDelay , self . KeyRepeatRate , self . UserData , self . Fonts , self . FontGlobalScale , self . FontAllowUserScaling , self . FontDefault , self . DisplayFramebufferScale , self . MouseDrawCursor , self . ConfigMacOSXBehaviors , self . ConfigInputTextCursorBlink , self . ConfigWindowsResizeFromEdges , self . ConfigWindowsMoveFromTitleBarOnly , self . ConfigWindowsMemoryCompactTimer , self . BackendPlatformName , self . BackendRendererName , self . BackendPlatformUserData , self . BackendRendererUserData , self . BackendLanguageUserData , self . GetClipboardTextFn , self . SetClipboardTextFn , self . ClipboardUserData , self . ImeSetInputScreenPosFn , self . ImeWindowHandle , self . RenderDrawListsFnUnused , self . MousePos , self . MouseDown , self . MouseWheel , self . MouseWheelH , self . KeyCtrl , self . KeyShift , self . KeyAlt , self . KeySuper , self . KeysDown . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputs , self . WantCaptureMouse , self . WantCaptureKeyboard , self . WantTextInput , self . WantSetMousePos , self . WantSaveIniSettings , self . NavActive , self . NavVisible , self . Framerate , self . MetricsRenderVertices , self . MetricsRenderIndices , self . MetricsRenderWindows , self . MetricsActiveWindows , self . MetricsActiveAllocations , self . MouseDelta , self . MousePosPrev , self . MouseClickedPos , self . MouseClickedTime , self . MouseClicked , self . MouseDoubleClicked , self . MouseReleased , self . MouseDownOwned , self . MouseDownWasDoubleClick , self . MouseDownDuration , self . MouseDownDurationPrev , self . MouseDragMaxDistanceAbs , self . MouseDragMaxDistanceSqr , self . KeysDownDuration . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . KeysDownDurationPrev . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . NavInputsDownDuration , self . NavInputsDownDurationPrev , self . InputQueueCharacters )
     }
 }
 #[repr(C)]
@@ -4037,6 +4060,7 @@ pub struct ImFontConfig {
     pub MergeMode: bool,
     pub RasterizerFlags: ::std::os::raw::c_uint,
     pub RasterizerMultiply: f32,
+    pub EllipsisChar: ImWchar,
     pub Name: [::std::os::raw::c_char; 40usize],
     pub DstFont: *mut ImFont,
 }
@@ -4215,8 +4239,18 @@ fn bindgen_test_layout_ImFontConfig() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).Name as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).EllipsisChar as *const _ as usize },
         84usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImFontConfig),
+            "::",
+            stringify!(EllipsisChar)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImFontConfig>())).Name as *const _ as usize },
+        86usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFontConfig),
@@ -4242,7 +4276,7 @@ impl Default for ImFontConfig {
 }
 impl ::std::fmt::Debug for ImFontConfig {
     fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
-        write ! ( f , "ImFontConfig {{ FontData: {:?}, FontDataSize: {:?}, FontDataOwnedByAtlas: {:?}, FontNo: {:?}, SizePixels: {:?}, OversampleH: {:?}, OversampleV: {:?}, PixelSnapH: {:?}, GlyphExtraSpacing: {:?}, GlyphOffset: {:?}, GlyphRanges: {:?}, GlyphMinAdvanceX: {:?}, GlyphMaxAdvanceX: {:?}, MergeMode: {:?}, RasterizerFlags: {:?}, RasterizerMultiply: {:?}, Name: [{}], DstFont: {:?} }}" , self . FontData , self . FontDataSize , self . FontDataOwnedByAtlas , self . FontNo , self . SizePixels , self . OversampleH , self . OversampleV , self . PixelSnapH , self . GlyphExtraSpacing , self . GlyphOffset , self . GlyphRanges , self . GlyphMinAdvanceX , self . GlyphMaxAdvanceX , self . MergeMode , self . RasterizerFlags , self . RasterizerMultiply , self . Name . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . DstFont )
+        write ! ( f , "ImFontConfig {{ FontData: {:?}, FontDataSize: {:?}, FontDataOwnedByAtlas: {:?}, FontNo: {:?}, SizePixels: {:?}, OversampleH: {:?}, OversampleV: {:?}, PixelSnapH: {:?}, GlyphExtraSpacing: {:?}, GlyphOffset: {:?}, GlyphRanges: {:?}, GlyphMinAdvanceX: {:?}, GlyphMaxAdvanceX: {:?}, MergeMode: {:?}, RasterizerFlags: {:?}, RasterizerMultiply: {:?}, EllipsisChar: {:?}, Name: [{}], DstFont: {:?} }}" , self . FontData , self . FontDataSize , self . FontDataOwnedByAtlas , self . FontNo , self . SizePixels , self . OversampleH , self . OversampleV , self . PixelSnapH , self . GlyphExtraSpacing , self . GlyphOffset , self . GlyphRanges , self . GlyphMinAdvanceX , self . GlyphMaxAdvanceX , self . MergeMode , self . RasterizerFlags , self . RasterizerMultiply , self . EllipsisChar , self . Name . iter ( ) . enumerate ( ) . map ( | ( i , v ) | format ! ( "{}{:?}" , if i > 0 { ", " } else { "" } , v ) ) . collect :: < String > ( ) , self . DstFont )
     }
 }
 #[repr(C)]
@@ -4726,6 +4760,7 @@ pub struct ImFont {
     pub ConfigData: *const ImFontConfig,
     pub ConfigDataCount: ::std::os::raw::c_short,
     pub FallbackChar: ImWchar,
+    pub EllipsisChar: ImWchar,
     pub Scale: f32,
     pub Ascent: f32,
     pub Descent: f32,
@@ -4736,7 +4771,7 @@ pub struct ImFont {
 fn bindgen_test_layout_ImFont() {
     assert_eq!(
         ::std::mem::size_of::<ImFont>(),
-        112usize,
+        120usize,
         concat!("Size of: ", stringify!(ImFont))
     );
     assert_eq!(
@@ -4855,8 +4890,18 @@ fn bindgen_test_layout_ImFont() {
         )
     );
     assert_eq!(
-        unsafe { &(*(::std::ptr::null::<ImFont>())).Scale as *const _ as usize },
+        unsafe { &(*(::std::ptr::null::<ImFont>())).EllipsisChar as *const _ as usize },
         92usize,
+        concat!(
+            "Offset of field: ",
+            stringify!(ImFont),
+            "::",
+            stringify!(EllipsisChar)
+        )
+    );
+    assert_eq!(
+        unsafe { &(*(::std::ptr::null::<ImFont>())).Scale as *const _ as usize },
+        96usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -4866,7 +4911,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).Ascent as *const _ as usize },
-        96usize,
+        100usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -4876,7 +4921,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).Descent as *const _ as usize },
-        100usize,
+        104usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -4886,7 +4931,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).MetricsTotalSurface as *const _ as usize },
-        104usize,
+        108usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -4896,7 +4941,7 @@ fn bindgen_test_layout_ImFont() {
     );
     assert_eq!(
         unsafe { &(*(::std::ptr::null::<ImFont>())).DirtyLookupTables as *const _ as usize },
-        108usize,
+        112usize,
         concat!(
             "Offset of field: ",
             stringify!(ImFont),
@@ -5697,10 +5742,10 @@ extern "C" {
     pub fn igDragScalar(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         v_speed: f32,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5709,11 +5754,11 @@ extern "C" {
     pub fn igDragScalarN(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         components: ::std::os::raw::c_int,
         v_speed: f32,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5807,9 +5852,9 @@ extern "C" {
     pub fn igSliderScalar(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5818,10 +5863,10 @@ extern "C" {
     pub fn igSliderScalarN(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         components: ::std::os::raw::c_int,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5852,9 +5897,9 @@ extern "C" {
         label: *const ::std::os::raw::c_char,
         size: ImVec2,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
-        v_min: *const ::std::os::raw::c_void,
-        v_max: *const ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
+        p_min: *const ::std::os::raw::c_void,
+        p_max: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         power: f32,
     ) -> bool;
@@ -5969,9 +6014,9 @@ extern "C" {
     pub fn igInputScalar(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
-        step: *const ::std::os::raw::c_void,
-        step_fast: *const ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
+        p_step: *const ::std::os::raw::c_void,
+        p_step_fast: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
@@ -5980,10 +6025,10 @@ extern "C" {
     pub fn igInputScalarN(
         label: *const ::std::os::raw::c_char,
         data_type: ImGuiDataType,
-        v: *mut ::std::os::raw::c_void,
+        p_data: *mut ::std::os::raw::c_void,
         components: ::std::os::raw::c_int,
-        step: *const ::std::os::raw::c_void,
-        step_fast: *const ::std::os::raw::c_void,
+        p_step: *const ::std::os::raw::c_void,
+        p_step_fast: *const ::std::os::raw::c_void,
         format: *const ::std::os::raw::c_char,
         flags: ImGuiInputTextFlags,
     ) -> bool;
@@ -6226,16 +6271,16 @@ extern "C" {
     );
 }
 extern "C" {
-    pub fn igBeginMainMenuBar() -> bool;
-}
-extern "C" {
-    pub fn igEndMainMenuBar();
-}
-extern "C" {
     pub fn igBeginMenuBar() -> bool;
 }
 extern "C" {
     pub fn igEndMenuBar();
+}
+extern "C" {
+    pub fn igBeginMainMenuBar() -> bool;
+}
+extern "C" {
+    pub fn igEndMainMenuBar();
 }
 extern "C" {
     pub fn igBeginMenu(label: *const ::std::os::raw::c_char, enabled: bool) -> bool;
@@ -6277,20 +6322,20 @@ extern "C" {
 extern "C" {
     pub fn igBeginPopupContextItem(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupContextWindow(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
         also_over_items: bool,
     ) -> bool;
 }
 extern "C" {
     pub fn igBeginPopupContextVoid(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
 extern "C" {
@@ -6306,7 +6351,7 @@ extern "C" {
 extern "C" {
     pub fn igOpenPopupOnItemClick(
         str_id: *const ::std::os::raw::c_char,
-        mouse_button: ::std::os::raw::c_int,
+        mouse_button: ImGuiMouseButton,
     ) -> bool;
 }
 extern "C" {
@@ -6431,7 +6476,7 @@ extern "C" {
     pub fn igIsItemFocused() -> bool;
 }
 extern "C" {
-    pub fn igIsItemClicked(mouse_button: ::std::os::raw::c_int) -> bool;
+    pub fn igIsItemClicked(mouse_button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
     pub fn igIsItemVisible() -> bool;
@@ -6447,6 +6492,9 @@ extern "C" {
 }
 extern "C" {
     pub fn igIsItemDeactivatedAfterEdit() -> bool;
+}
+extern "C" {
+    pub fn igIsItemToggledOpen() -> bool;
 }
 extern "C" {
     pub fn igIsAnyItemHovered() -> bool;
@@ -6527,22 +6575,19 @@ extern "C" {
     ) -> ::std::os::raw::c_int;
 }
 extern "C" {
-    pub fn igIsMouseDown(button: ::std::os::raw::c_int) -> bool;
+    pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
 }
 extern "C" {
-    pub fn igIsAnyMouseDown() -> bool;
+    pub fn igIsMouseDown(button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
-    pub fn igIsMouseClicked(button: ::std::os::raw::c_int, repeat: bool) -> bool;
+    pub fn igIsMouseClicked(button: ImGuiMouseButton, repeat: bool) -> bool;
 }
 extern "C" {
-    pub fn igIsMouseDoubleClicked(button: ::std::os::raw::c_int) -> bool;
+    pub fn igIsMouseReleased(button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
-    pub fn igIsMouseReleased(button: ::std::os::raw::c_int) -> bool;
-}
-extern "C" {
-    pub fn igIsMouseDragging(button: ::std::os::raw::c_int, lock_threshold: f32) -> bool;
+    pub fn igIsMouseDoubleClicked(button: ImGuiMouseButton) -> bool;
 }
 extern "C" {
     pub fn igIsMouseHoveringRect(r_min: ImVec2, r_max: ImVec2, clip: bool) -> bool;
@@ -6551,16 +6596,19 @@ extern "C" {
     pub fn igIsMousePosValid(mouse_pos: *const ImVec2) -> bool;
 }
 extern "C" {
-    pub fn igResetMouseDragDelta(button: ::std::os::raw::c_int);
+    pub fn igIsAnyMouseDown() -> bool;
+}
+extern "C" {
+    pub fn igIsMouseDragging(button: ImGuiMouseButton, lock_threshold: f32) -> bool;
+}
+extern "C" {
+    pub fn igResetMouseDragDelta(button: ImGuiMouseButton);
 }
 extern "C" {
     pub fn igGetMouseCursor() -> ImGuiMouseCursor;
 }
 extern "C" {
-    pub fn igSetMouseCursor(type_: ImGuiMouseCursor);
-}
-extern "C" {
-    pub fn igCaptureKeyboardFromApp(want_capture_keyboard_value: bool);
+    pub fn igSetMouseCursor(cursor_type: ImGuiMouseCursor);
 }
 extern "C" {
     pub fn igCaptureMouseFromApp(want_capture_mouse_value: bool);
@@ -6973,8 +7021,8 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddLine(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
+        p1: ImVec2,
+        p2: ImVec2,
         col: ImU32,
         thickness: f32,
     );
@@ -6982,8 +7030,8 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddRect(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
+        p_min: ImVec2,
+        p_max: ImVec2,
         col: ImU32,
         rounding: f32,
         rounding_corners: ImDrawCornerFlags,
@@ -6993,8 +7041,8 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddRectFilled(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
+        p_min: ImVec2,
+        p_max: ImVec2,
         col: ImU32,
         rounding: f32,
         rounding_corners: ImDrawCornerFlags,
@@ -7003,8 +7051,8 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddRectFilledMultiColor(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
+        p_min: ImVec2,
+        p_max: ImVec2,
         col_upr_left: ImU32,
         col_upr_right: ImU32,
         col_bot_right: ImU32,
@@ -7014,10 +7062,10 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddQuad(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
-        c: ImVec2,
-        d: ImVec2,
+        p1: ImVec2,
+        p2: ImVec2,
+        p3: ImVec2,
+        p4: ImVec2,
         col: ImU32,
         thickness: f32,
     );
@@ -7025,19 +7073,19 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddQuadFilled(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
-        c: ImVec2,
-        d: ImVec2,
+        p1: ImVec2,
+        p2: ImVec2,
+        p3: ImVec2,
+        p4: ImVec2,
         col: ImU32,
     );
 }
 extern "C" {
     pub fn ImDrawList_AddTriangle(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
-        c: ImVec2,
+        p1: ImVec2,
+        p2: ImVec2,
+        p3: ImVec2,
         col: ImU32,
         thickness: f32,
     );
@@ -7045,16 +7093,16 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddTriangleFilled(
         self_: *mut ImDrawList,
-        a: ImVec2,
-        b: ImVec2,
-        c: ImVec2,
+        p1: ImVec2,
+        p2: ImVec2,
+        p3: ImVec2,
         col: ImU32,
     );
 }
 extern "C" {
     pub fn ImDrawList_AddCircle(
         self_: *mut ImDrawList,
-        centre: ImVec2,
+        center: ImVec2,
         radius: f32,
         col: ImU32,
         num_segments: ::std::os::raw::c_int,
@@ -7064,7 +7112,7 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_AddCircleFilled(
         self_: *mut ImDrawList,
-        centre: ImVec2,
+        center: ImVec2,
         radius: f32,
         col: ImU32,
         num_segments: ::std::os::raw::c_int,
@@ -7090,45 +7138,6 @@ extern "C" {
         text_end: *const ::std::os::raw::c_char,
         wrap_width: f32,
         cpu_fine_clip_rect: *const ImVec4,
-    );
-}
-extern "C" {
-    pub fn ImDrawList_AddImage(
-        self_: *mut ImDrawList,
-        user_texture_id: ImTextureID,
-        a: ImVec2,
-        b: ImVec2,
-        uv_a: ImVec2,
-        uv_b: ImVec2,
-        col: ImU32,
-    );
-}
-extern "C" {
-    pub fn ImDrawList_AddImageQuad(
-        self_: *mut ImDrawList,
-        user_texture_id: ImTextureID,
-        a: ImVec2,
-        b: ImVec2,
-        c: ImVec2,
-        d: ImVec2,
-        uv_a: ImVec2,
-        uv_b: ImVec2,
-        uv_c: ImVec2,
-        uv_d: ImVec2,
-        col: ImU32,
-    );
-}
-extern "C" {
-    pub fn ImDrawList_AddImageRounded(
-        self_: *mut ImDrawList,
-        user_texture_id: ImTextureID,
-        a: ImVec2,
-        b: ImVec2,
-        uv_a: ImVec2,
-        uv_b: ImVec2,
-        col: ImU32,
-        rounding: f32,
-        rounding_corners: ImDrawCornerFlags,
     );
 }
 extern "C" {
@@ -7162,6 +7171,45 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn ImDrawList_AddImage(
+        self_: *mut ImDrawList,
+        user_texture_id: ImTextureID,
+        p_min: ImVec2,
+        p_max: ImVec2,
+        uv_min: ImVec2,
+        uv_max: ImVec2,
+        col: ImU32,
+    );
+}
+extern "C" {
+    pub fn ImDrawList_AddImageQuad(
+        self_: *mut ImDrawList,
+        user_texture_id: ImTextureID,
+        p1: ImVec2,
+        p2: ImVec2,
+        p3: ImVec2,
+        p4: ImVec2,
+        uv1: ImVec2,
+        uv2: ImVec2,
+        uv3: ImVec2,
+        uv4: ImVec2,
+        col: ImU32,
+    );
+}
+extern "C" {
+    pub fn ImDrawList_AddImageRounded(
+        self_: *mut ImDrawList,
+        user_texture_id: ImTextureID,
+        p_min: ImVec2,
+        p_max: ImVec2,
+        uv_min: ImVec2,
+        uv_max: ImVec2,
+        col: ImU32,
+        rounding: f32,
+        rounding_corners: ImDrawCornerFlags,
+    );
+}
+extern "C" {
     pub fn ImDrawList_PathClear(self_: *mut ImDrawList);
 }
 extern "C" {
@@ -7179,7 +7227,7 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_PathArcTo(
         self_: *mut ImDrawList,
-        centre: ImVec2,
+        center: ImVec2,
         radius: f32,
         a_min: f32,
         a_max: f32,
@@ -7189,7 +7237,7 @@ extern "C" {
 extern "C" {
     pub fn ImDrawList_PathArcToFast(
         self_: *mut ImDrawList,
-        centre: ImVec2,
+        center: ImVec2,
         radius: f32,
         a_min_of_12: ::std::os::raw::c_int,
         a_max_of_12: ::std::os::raw::c_int,
@@ -7727,13 +7775,13 @@ extern "C" {
 extern "C" {
     pub fn igGetMouseDragDelta_nonUDT(
         pOut: *mut ImVec2,
-        button: ::std::os::raw::c_int,
+        button: ImGuiMouseButton,
         lock_threshold: f32,
     );
 }
 extern "C" {
     pub fn igGetMouseDragDelta_nonUDT2(
-        button: ::std::os::raw::c_int,
+        button: ImGuiMouseButton,
         lock_threshold: f32,
     ) -> ImVec2_Simple;
 }
@@ -9125,6 +9173,90 @@ extern "C" {
     );
 }
 extern "C" {
+    pub fn ImVector_float_shrink(self_: *mut ImVector_float, new_size: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn ImVector_ImWchar_shrink(self_: *mut ImVector_ImWchar, new_size: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn ImVector_ImDrawVert_shrink(
+        self_: *mut ImVector_ImDrawVert,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImFontGlyph_shrink(
+        self_: *mut ImVector_ImFontGlyph,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImGuiTextRange_shrink(
+        self_: *mut ImVector_ImGuiTextRange,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImGuiStoragePair_shrink(
+        self_: *mut ImVector_ImGuiStoragePair,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImDrawChannel_shrink(
+        self_: *mut ImVector_ImDrawChannel,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_char_shrink(self_: *mut ImVector_char, new_size: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn ImVector_ImU32_shrink(self_: *mut ImVector_ImU32, new_size: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn ImVector_ImFontAtlasCustomRect_shrink(
+        self_: *mut ImVector_ImFontAtlasCustomRect,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImTextureID_shrink(
+        self_: *mut ImVector_ImTextureID,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImFontConfig_shrink(
+        self_: *mut ImVector_ImFontConfig,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImFontPtr_shrink(
+        self_: *mut ImVector_ImFontPtr,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImDrawCmd_shrink(
+        self_: *mut ImVector_ImDrawCmd,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImVec4_shrink(self_: *mut ImVector_ImVec4, new_size: ::std::os::raw::c_int);
+}
+extern "C" {
+    pub fn ImVector_ImDrawIdx_shrink(
+        self_: *mut ImVector_ImDrawIdx,
+        new_size: ::std::os::raw::c_int,
+    );
+}
+extern "C" {
+    pub fn ImVector_ImVec2_shrink(self_: *mut ImVector_ImVec2, new_size: ::std::os::raw::c_int);
+}
+extern "C" {
     pub fn ImVector_float_reserve(self_: *mut ImVector_float, new_capacity: ::std::os::raw::c_int);
 }
 extern "C" {
@@ -9817,6 +9949,54 @@ extern "C" {
 }
 extern "C" {
     pub fn ImVector_char_contains(self_: *const ImVector_char, v: ::std::os::raw::c_char) -> bool;
+}
+extern "C" {
+    pub fn ImVector_float_find(self_: *mut ImVector_float, v: f32) -> *mut f32;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_find(self_: *mut ImVector_ImWchar, v: ImWchar) -> *mut ImWchar;
+}
+extern "C" {
+    pub fn ImVector_char_find(
+        self_: *mut ImVector_char,
+        v: ::std::os::raw::c_char,
+    ) -> *mut ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn ImVector_float_find_const(self_: *const ImVector_float, v: f32) -> *const f32;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_find_const(
+        self_: *const ImVector_ImWchar,
+        v: ImWchar,
+    ) -> *const ImWchar;
+}
+extern "C" {
+    pub fn ImVector_char_find_const(
+        self_: *const ImVector_char,
+        v: ::std::os::raw::c_char,
+    ) -> *const ::std::os::raw::c_char;
+}
+extern "C" {
+    pub fn ImVector_float_find_erase(self_: *mut ImVector_float, v: f32) -> bool;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_find_erase(self_: *mut ImVector_ImWchar, v: ImWchar) -> bool;
+}
+extern "C" {
+    pub fn ImVector_char_find_erase(self_: *mut ImVector_char, v: ::std::os::raw::c_char) -> bool;
+}
+extern "C" {
+    pub fn ImVector_float_find_erase_unsorted(self_: *mut ImVector_float, v: f32) -> bool;
+}
+extern "C" {
+    pub fn ImVector_ImWchar_find_erase_unsorted(self_: *mut ImVector_ImWchar, v: ImWchar) -> bool;
+}
+extern "C" {
+    pub fn ImVector_char_find_erase_unsorted(
+        self_: *mut ImVector_char,
+        v: ::std::os::raw::c_char,
+    ) -> bool;
 }
 extern "C" {
     pub fn ImVector_float_index_from_ptr(
